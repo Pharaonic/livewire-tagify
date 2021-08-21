@@ -1,0 +1,41 @@
+{
+    "name": "pharaonic/livewire-tagify",
+    "description": "Simple way to handle Tagify for livewire components.",
+    "keywords": [
+        "livewire tagify",
+        "livewire tags",
+        "livewire keywords",
+        "livewire-tagify",
+        "livewire",
+        "laravel"
+    ],
+    "homepage": "https://github.com/pharaonic/livewire-tagify",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Moamen Eltouny (Raggi)",
+            "email": "raggi@raggitech.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "livewire/livewire": ">=2.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Pharaonic\\Livewire\\Tagify\\": "src"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Pharaonic\\Livewire\\Tagify\\TagifyServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
