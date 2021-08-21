@@ -13,7 +13,7 @@
 
 <br>
 
-<pre align="center">Simple way to handle the tagify for Livewire components.</pre>
+<pre align="center">Simple way to handle the Tagify for Livewire components.</pre>
 
 
 ## Documentation
