@@ -28,7 +28,7 @@ export async function remove(page, id, text) {
 }
 
 export async function settle(page) {
-    // Tagify reports changes after 100ms, and Livewire 1 debounces messages by 5ms.
+    // Tagify reports changes after 100ms, and Livewire debounces messages by 5ms.
     await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 150)))
     await page.waitForLoadState('networkidle')
     await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 20)))

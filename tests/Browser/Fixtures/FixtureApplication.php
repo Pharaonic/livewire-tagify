@@ -15,7 +15,7 @@ final class FixtureApplication
 {
     use CreatesApplication;
 
-    public const FIXTURES = ['tagify', 'legacy', 'issue7', 'morph', 'bundle'];
+    public const FIXTURES = ['tagify', 'legacy', 'issue7', 'morph', 'bundle', 'defer'];
 
     /**
      * @param  \Illuminate\Foundation\Application  $app
@@ -41,6 +41,7 @@ final class FixtureApplication
         Livewire::component('legacy-demo', LegacyDemo::class);
         Livewire::component('issue7-demo', Issue7Demo::class);
         Livewire::component('morph-demo', MorphDemo::class);
+        Livewire::component('defer-demo', DeferDemo::class);
 
         Route::middleware('web')->group(function (): void {
             Route::get('/{fixture}', fn (string $fixture) => view('fixtures::page', ['fixture' => $fixture]))
