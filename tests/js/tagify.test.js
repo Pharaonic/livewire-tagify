@@ -122,7 +122,7 @@ test('does not write a value Livewire already holds', async () => {
 })
 
 test('binds wire:model when there is no data-property, and data-property wins', async () => {
-    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model="ignored">', { modelBinding })
+    const page = setup('<input id="a" wire:model.live="labels"><input id="b" wire:model="ignored">', { modelBinding })
     const a = page.mount('#a', { bound: component({ labels: ['x'] }) })
     const b = page.mount('#b', { property: 'chosen', bound: component({ chosen: ['y'], ignored: ['z'] }) })
 
@@ -139,7 +139,7 @@ test('binds wire:model when there is no data-property, and data-property wins', 
 })
 
 test('keeps Tagify\'s change event from Livewire and fires one for wire:change after the write', async () => {
-    const page = setup('<input id="a" wire:model="labels" wire:change="changed"><input id="b" wire:model="labels"><input id="c">', { modelBinding })
+    const page = setup('<input id="a" wire:model.live="labels" wire:change="changed"><input id="b" wire:model.live="labels"><input id="c">', { modelBinding })
     const a = page.mount('#a', { bound: component({ labels: [] }) })
     const b = page.mount('#b', { bound: component({ labels: [] }) })
     const c = page.mount('#c')
@@ -159,20 +159,23 @@ test('keeps Tagify\'s change event from Livewire and fires one for wire:change a
     assert.deepEqual(native, { a: ['Event'], b: 0, c: 1 })
 })
 
-test('reads wire:model with Livewire 2 semantics: live unless deferred', () => {
-    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model.lazy="a.b"><input id="c" wire:model.debounce.500ms="c"><input id="d" wire:model=" "><input id="e"><input id="f" wire:model.defer="f">', { withTagify: false })
+test('reads wire:model with Livewire 3 semantics: deferred unless live, lazy, change, or blur', () => {
+    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model.live="a.b"><input id="c" wire:model.live.debounce.500ms="c"><input id="d" wire:model=" "><input id="e"><input id="f" wire:model.lazy="f"><input id="g" wire:model.change="g"><input id="h" wire:model.blur="h"><input id="i" wire:model.defer="i">', { withTagify: false })
     const binding = (id) => modelBinding(page.document.getElementById(id))
 
-    assert.deepEqual(binding('a'), { property: 'labels', live: true })
+    assert.deepEqual(binding('a'), { property: 'labels', live: false })
     assert.deepEqual(binding('b'), { property: 'a.b', live: true })
     assert.deepEqual(binding('c'), { property: 'c', live: true })
-    assert.deepEqual(binding('f'), { property: 'f', live: false })
+    assert.deepEqual(binding('f'), { property: 'f', live: true })
+    assert.deepEqual(binding('g'), { property: 'g', live: true })
+    assert.deepEqual(binding('h'), { property: 'h', live: true })
+    assert.deepEqual(binding('i'), { property: 'i', live: false })
     assert.equal(binding('d'), null)
     assert.equal(binding('e'), null)
 })
 
-test('writes wire:model.defer as a deferred update, and still fires wire:change after it', async () => {
-    const page = setup('<input id="a" wire:model.defer="labels" wire:change="changed">', { modelBinding })
+test('writes a plain wire:model as a deferred update, and still fires wire:change after it', async () => {
+    const page = setup('<input id="a" wire:model="labels" wire:change="changed">', { modelBinding })
     const field = page.mount('#a', { bound: component({ labels: [] }) })
     let native = 0
 
@@ -185,26 +188,33 @@ test('writes wire:model.defer as a deferred update, and still fires wire:change 
     assert.equal(native, 1)
 })
 
-test('puts Tagify\'s value back after Livewire writes to a wire:model field', async () => {
-    const page = setup('<input id="a" wire:model="labels"><input id="b">', { modelBinding })
-    const hooks = []
-
-    page.win.Livewire = { hook: (name, callback) => hooks.push([name, callback]) }
-    guardModelWrites(page.win)
-    guardModelWrites(page.win)
-    assert.deepEqual(hooks.map(([name]) => name), ['interceptWireModelSetValue'])
-
-    const field = page.mount('#a', { bound: component({ labels: [{ value: 'php' }] }) })
-    const plainInput = page.document.getElementById('b')
-    const ownValue = field.element.value
-
-    for (const element of [field.element, plainInput]) {
-        hooks[0][1]([{ value: 'php' }], element)
-        element.value = '[object Object]'
+test('puts Tagify\'s value back after Alpine writes to a wire:model field', async () => {
+    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model="labels"><input id="c">', { modelBinding, guardModelWrites })
+    const alpine = (element) => (value) => {
+        element.value = String(value)
     }
 
-    await Promise.resolve()
-    assert.equal(field.element.value, ownValue)
+    // Alpine set up the first field before Tagify, the second one after.
+    const first = page.document.getElementById('a')
+
+    first._x_forceModelUpdate = alpine(first)
+
+    const a = page.mount('#a', { bound: component({ labels: [{ value: 'php' }] }) })
+    const b = page.mount('#b', { bound: component({ labels: [{ value: 'php' }] }) })
+    const plainInput = page.document.getElementById('c')
+
+    b.element._x_forceModelUpdate = alpine(b.element)
+    plainInput._x_forceModelUpdate = alpine(plainInput)
+    guardModelWrites(page.win, a.element)
+
+    const own = { a: a.element.value, b: b.element.value }
+
+    for (const element of [a.element, b.element, plainInput]) {
+        element._x_forceModelUpdate([{ value: 'php' }])
+    }
+
+    assert.equal(a.element.value, own.a)
+    assert.equal(b.element.value, own.b)
     assert.equal(plainInput.value, '[object Object]')
 })
 
