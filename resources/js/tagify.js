@@ -14,9 +14,10 @@ export function tagifyError(code, message) {
  *
  * - `window` is the page window; Tagify is read from it at mount.
  * - `modelBinding(element)` reads `wire:model` with the line's Livewire semantics.
+ * - `guardModelWrites(window)` keeps the line's Livewire from writing to `wire:model` fields.
  * - `assistant()` returns the runtime once it has registered this integration.
  */
-export function createTagify({ window, modelBinding, assistant }) {
+export function createTagify({ window, modelBinding, guardModelWrites = () => {}, assistant }) {
     const records = new WeakMap()
     // Elements waiting for Tagify until the page has loaded.
     const waiting = new Set()
@@ -64,6 +65,10 @@ export function createTagify({ window, modelBinding, assistant }) {
         // Livewire listens to the field for wire:model and wire:change.
         const shielded = property !== null || hasWire(element, 'wire:model') || hasWire(element, 'wire:change')
         let tagify = create(element, settings)
+
+        if (hasWire(element, 'wire:model')) {
+            guardModelWrites(window)
+        }
 
         const apply = (incoming) => {
             if (!same(value.read(tagify), incoming)) {

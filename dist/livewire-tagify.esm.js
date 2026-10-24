@@ -40,6 +40,22 @@ function modelBinding(element) {
   const model = readModel(element);
   return model === null ? null : { property: model.property, live: true };
 }
+var guarded = /* @__PURE__ */ new WeakSet();
+function guardModelWrites(window2) {
+  const livewire = window2.livewire;
+  if (guarded.has(window2) || !livewire || typeof livewire.hook !== "function") {
+    return;
+  }
+  guarded.add(window2);
+  livewire.hook("interceptWireModelSetValue", (domElement) => {
+    const element = domElement && domElement.el;
+    if (element && element.__tagify && typeof element.tagifyValue === "string") {
+      window2.queueMicrotask(() => {
+        element.value = element.tagifyValue;
+      });
+    }
+  });
+}
 
 // resources/js/options.js
 var enabled = (value) => value.toLowerCase() !== "false";
@@ -202,7 +218,8 @@ var hasWire = (element, directive) => Array.from(element.attributes).some((attri
 function tagifyError(code, message) {
   return Object.assign(new Error(message), { code });
 }
-function createTagify({ window: window2, modelBinding: modelBinding2, assistant }) {
+function createTagify({ window: window2, modelBinding: modelBinding2, guardModelWrites: guardModelWrites2 = () => {
+}, assistant }) {
   const records = /* @__PURE__ */ new WeakMap();
   const waiting = /* @__PURE__ */ new Set();
   const loaded = () => window2.document.readyState === "complete";
@@ -237,6 +254,9 @@ function createTagify({ window: window2, modelBinding: modelBinding2, assistant 
     const binding = property !== null ? { property, live: true } : modelBinding2(element);
     const shielded = property !== null || hasWire(element, "wire:model") || hasWire(element, "wire:change");
     let tagify = create(element, settings);
+    if (hasWire(element, "wire:model")) {
+      guardModelWrites2(window2);
+    }
     const apply = (incoming) => {
       if (!same(value.read(tagify), incoming)) {
         value.load(tagify, incoming);
@@ -338,7 +358,7 @@ function install(win) {
       pending.push(callback);
     }
   };
-  const integration = createTagify({ window: win, modelBinding, assistant: () => assistant });
+  const integration = createTagify({ window: win, modelBinding, guardModelWrites, assistant: () => assistant });
   const api = Object.freeze({});
   namespace.tagify = api;
   installLegacy(win, namespace, withAssistant);
