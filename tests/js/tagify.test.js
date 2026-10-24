@@ -163,7 +163,7 @@ test('puts Tagify\'s value back after Livewire writes to a wire:model field', as
     const page = setup('<input id="a" wire:model="labels"><input id="b">', { modelBinding })
     const hooks = []
 
-    page.win.livewire = { hook: (name, callback) => hooks.push([name, callback]) }
+    page.win.Livewire = { hook: (name, callback) => hooks.push([name, callback]) }
     guardModelWrites(page.win)
     guardModelWrites(page.win)
     assert.deepEqual(hooks.map(([name]) => name), ['interceptWireModelSetValue'])
@@ -173,7 +173,7 @@ test('puts Tagify\'s value back after Livewire writes to a wire:model field', as
     const ownValue = field.element.value
 
     for (const element of [field.element, plainInput]) {
-        hooks[0][1]({ el: element }, [{ value: 'php' }])
+        hooks[0][1]([{ value: 'php' }], element)
         element.value = '[object Object]'
     }
 

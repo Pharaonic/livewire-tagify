@@ -15,25 +15,23 @@ export function modelBinding(element) {
 const guarded = new WeakSet()
 
 /**
- * Keeps Livewire 1 from writing to Tagify fields.
+ * Keeps Livewire 2 from writing to Tagify fields.
  *
- * After a response that changed a property, Livewire 1 writes the model value
+ * After a response that changed a property, Livewire 2 writes the model value
  * as text into every `wire:model` field without focus, inside `wire:ignore` too.
  * Tagify would reload its tags from that text on its next check, turning tag
  * objects into "[object Object]" and dropping what the user is typing. Tagify's
  * own value is put back right after the write, before Tagify checks.
  */
 export function guardModelWrites(window) {
-    const livewire = window.livewire
+    const livewire = window.Livewire
 
     if (guarded.has(window) || !livewire || typeof livewire.hook !== 'function') {
         return
     }
 
     guarded.add(window)
-    livewire.hook('interceptWireModelSetValue', (domElement) => {
-        const element = domElement && domElement.el
-
+    livewire.hook('interceptWireModelSetValue', (_value, element) => {
         if (element && element.__tagify && typeof element.tagifyValue === 'string') {
             window.queueMicrotask(() => {
                 element.value = element.tagifyValue

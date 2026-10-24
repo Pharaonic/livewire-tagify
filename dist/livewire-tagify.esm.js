@@ -42,13 +42,12 @@ function modelBinding(element) {
 }
 var guarded = /* @__PURE__ */ new WeakSet();
 function guardModelWrites(window2) {
-  const livewire = window2.livewire;
+  const livewire = window2.Livewire;
   if (guarded.has(window2) || !livewire || typeof livewire.hook !== "function") {
     return;
   }
   guarded.add(window2);
-  livewire.hook("interceptWireModelSetValue", (domElement) => {
-    const element = domElement && domElement.el;
+  livewire.hook("interceptWireModelSetValue", (_value, element) => {
     if (element && element.__tagify && typeof element.tagifyValue === "string") {
       window2.queueMicrotask(() => {
         element.value = element.tagifyValue;
