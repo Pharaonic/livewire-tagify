@@ -5,7 +5,7 @@
 | Attribute | Value |
 | --- | --- |
 | `data-pharaonic` | `tagify` |
-| `wire:model` | Property name or dot path; every change is sent right away on Livewire 1 |
+| `wire:model` | Property name or dot path; `.defer` waits for the next request; every other form is sent right away |
 | `data-property` | Property name or dot path; wins over `wire:model` |
 | `data-direct` | Bind each tag's `data-key` instead of tag objects; `"false"` turns it off |
 | `data-key` | The tag field `data-direct` binds; `value` when absent |

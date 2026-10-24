@@ -13,8 +13,9 @@ One line per Livewire major, each on the Assistant line of the same major. `deve
 | Line | Livewire | Livewire Assistant | Laravel | PHP |
 | --- | --- | --- | --- | --- |
 | 1.x | `>=1.3.0 <1.3.7 \|\| >=1.3.8 <2.0` | `^1.0` | `^7.30 \|\| ^8.75` | `>=7.4 <8.0` |
+| 2.x | `^2.12.7` | `^2.0` | `^7.30 \|\| ^8.75 \|\| ^9.0 \|\| ^10.0` | `>=8.0 <8.4` |
 
-Versions are `N.minor.patch`, where `N` is the Livewire major. Releases 1.0.0 to 1.2.1 predate this scheme and were built for Livewire 2; the 1.x line continues at 1.3.0 for Livewire 1.
+Versions are `N.minor.patch`, where `N` is the Livewire major. Releases 1.0.0 to 1.2.1 predate this scheme and were built for Livewire 2; the 1.x line continues at 1.3.0 for Livewire 1, and 2.x is their successor.
 
 ## Core library
 
@@ -41,18 +42,19 @@ Versions are `N.minor.patch`, where `N` is the Livewire major. Releases 1.0.0 to
 - After a response that changed a property, Livewire writes the model value as text into every `wire:model` field without focus, inside `wire:ignore` too. Each line's `livewire.js` hooks `interceptWireModelSetValue` and puts Tagify's own value (`tagifyValue`) back in a microtask, before Tagify's next check would reload the tags from that text.
 - The response to a write reports the value it carried, which is older than the field when the user kept typing. A field remembers the values it sent and does not show one of them when Livewire reports it back; any other value from the server is shown.
 - 1.x: every genuine Livewire 1 release requires PHP 7, so the line runs on PHP 7.4. Pint lives in `tools/pint` and runs on PHP 8.1. `livewire/livewire` 1.3.7 contains Livewire 2 code and is excluded. The advisory ignore list adds Livewire 1 (CVE-2024-47823 has no Livewire 1 fix) and `zbateson/mail-mime-parser`.
+- 2.x: Livewire 2 supports Laravel 7 to 10, so one line covers four Laravel majors, each on the PHP minors it supports (8.0 to 8.3). `^2.12.7` keeps every Livewire release with CVE-2024-47823 out. `.defer` writes are deferred through the bridge; they settle only with the next request, so `wire:change` is fired right away instead of after the write. `composer check`, including Pint, runs on PHP 8.0 with the highest dependencies, which resolve Laravel 9.
 - The advisory ignore list covers the Laravel framework tree of the line, which no longer receives security fixes, following the Laravel DNA.
 
 ## Verification
 
 ```bash
-php7.4 composer check
-php8.1 tools/pint/vendor/bin/pint --test
+php8.0 composer check     # 2.x
+php7.4 composer check     # 1.x, then: php8.1 tools/pint/vendor/bin/pint --test
 npm ci
 npm run check            # lint, unit tests, dist check, browser tests
 ```
 
-Browser tests start `php -S` on the fixture app in `tests/Browser` with real Livewire components, the real Assistant runtime from `vendor/`, and Tagify from `node_modules/`. They use `php7.4` unless `FIXTURE_PHP` names another PHP 7.4 binary. Set `BROWSERS=chromium,firefox,webkit` to choose browsers. Each open issue the line fixes has a browser test named after it. Run them for every Laravel major with lowest and highest dependencies, for example:
+Browser tests start `php -S` on the fixture app in `tests/Browser` with real Livewire components, the real Assistant runtime from `vendor/`, and Tagify from `node_modules/`. They use the lowest PHP of the line (`php7.4` on 1.x, `php8.0` on 2.x) unless `FIXTURE_PHP` names another PHP of the line. Set `BROWSERS=chromium,firefox,webkit` to choose browsers. Each open issue the line fixes has a browser test named after it. Run them for every Laravel major with lowest and highest dependencies, for example:
 
 ```bash
 php7.4 composer update --with laravel/framework:^7.30 --with orchestra/testbench:^5.20 --prefer-lowest
@@ -60,7 +62,7 @@ php7.4 composer update --with laravel/framework:^7.30 --with orchestra/testbench
 
 ## Branch notes
 
-`main` holds the 1.0 to 1.2.1 releases, which were built for Livewire 2, and is not developed further. The 1.x line was started from it for Livewire 1.
+`main` holds the 1.0 to 1.2.1 releases, which were built for Livewire 2, and is not developed further. The 1.x line was started from it for Livewire 1, and 2.x from 1.x for Livewire 2. `develop` follows the newest line.
 
 ## Documentation
 

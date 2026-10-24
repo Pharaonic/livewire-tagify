@@ -9,4 +9,4 @@ buttons:
     icon: arrow-right
 ---
 
-Read the full documentation for installation, binding and value shapes, shorthand attributes and Tagify settings, select and mix modes, dynamic fields, and examples.
+Read the full documentation for installation, binding and value shapes, shorthand attributes and Tagify settings, select and mix modes, dynamic fields, upgrading from 1.2, and examples.
