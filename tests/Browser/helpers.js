@@ -37,7 +37,7 @@ export async function settle(page) {
 export function messages(page) {
     const requests = []
 
-    page.on('request', (request) => request.url().includes('/livewire/message/') && requests.push(request.postDataJSON()))
+    page.on('request', (request) => request.url().includes('/livewire/update') && requests.push(request.postDataJSON()))
 
     return requests
 }

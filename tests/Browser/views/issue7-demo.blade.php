@@ -5,8 +5,8 @@
     {{-- The markup from issue #7. --}}
     <div wire:ignore>
         <input id="group" data-pharaonic="tagify"
-               data-component-id="{{$this->id}}"
-               wire:model="state.group"
+               data-component-id="{{$this->getId()}}"
+               wire:model.live="state.group"
                data-suggest-list='{{json_encode(collect($groups)->pluck('name')->unique())}}'
                data-suggest
                data-direct

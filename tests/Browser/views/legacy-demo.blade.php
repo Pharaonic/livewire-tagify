@@ -5,12 +5,12 @@
     <output id="extra-value">{{ json_encode($extra) }}</output>
 
     <div wire:ignore>
-        <input id="keywords" data-pharaonic="tagify" data-component-id="{{ $this->id }}" wire:model="keywords"
+        <input id="keywords" data-pharaonic="tagify" data-component-id="{{ $this->getId() }}" wire:model.live="keywords"
             data-black-list='["spam"]' data-max="3" data-delimiters=",|;">
     </div>
 
     <div wire:ignore>
-        <input id="groups" data-pharaonic="tagify" data-component-id="{{ $this->id }}" wire:model="groups"
+        <input id="groups" data-pharaonic="tagify" data-component-id="{{ $this->getId() }}" wire:model.live="groups"
             data-suggest-list='["Team A","Team B","Team C"]' data-suggest-enforce data-direct data-classname="groups-menu">
     </div>
 
@@ -29,7 +29,7 @@
         window.addManualField = function (how, componentId) {
             var holder = document.getElementById('manual');
 
-            holder.innerHTML = '<input id="extra" data-pharaonic="tagify" wire:model="extra" data-direct>';
+            holder.innerHTML = '<input id="extra" data-pharaonic="tagify" wire:model.live="extra" data-direct>';
 
             if (how === 'event') {
                 window.dispatchEvent(new CustomEvent('pharaonic.tagify.load', { detail: { target: '#extra', component: componentId } }));
