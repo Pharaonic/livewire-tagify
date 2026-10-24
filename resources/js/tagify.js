@@ -14,9 +14,10 @@ export function tagifyError(code, message) {
  *
  * - `window` is the page window; Tagify is read from it at mount.
  * - `modelBinding(element)` reads `wire:model` with the line's Livewire semantics.
+ * - `guardModelWrites(window)` keeps the line's Livewire from writing to `wire:model` fields.
  * - `assistant()` returns the runtime once it has registered this integration.
  */
-export function createTagify({ window, modelBinding, assistant }) {
+export function createTagify({ window, modelBinding, guardModelWrites = () => {}, assistant }) {
     const records = new WeakMap()
     // Elements waiting for Tagify until the page has loaded.
     const waiting = new Set()
@@ -65,6 +66,10 @@ export function createTagify({ window, modelBinding, assistant }) {
         const shielded = property !== null || hasWire(element, 'wire:model') || hasWire(element, 'wire:change')
         let tagify = create(element, settings)
 
+        if (hasWire(element, 'wire:model')) {
+            guardModelWrites(window)
+        }
+
         const apply = (incoming) => {
             if (!same(value.read(tagify), incoming)) {
                 value.load(tagify, incoming)
@@ -77,6 +82,22 @@ export function createTagify({ window, modelBinding, assistant }) {
             }
         }
 
+        // Values this field sent that Livewire has not reported back yet, oldest first.
+        const sent = []
+
+        // The response to an earlier write reports that value while the user has kept
+        // typing; the newer value is already on its way, so the older one is not shown.
+        const received = (incoming) => {
+            const echoed = sent.findIndex((entry) => same(entry, incoming))
+
+            if (echoed === -1) {
+                sent.length = 0
+                apply(incoming)
+            } else {
+                sent.splice(0, echoed + 1)
+            }
+        }
+
         // Returns the request that carries a changed value, or null when Livewire already holds it.
         const write = () => {
             const next = value.read(tagify)
@@ -85,7 +106,17 @@ export function createTagify({ window, modelBinding, assistant }) {
                 return null
             }
 
-            return component.set(binding.property, next, { live: binding.live })
+            sent.push(next)
+
+            return component.set(binding.property, next, { live: binding.live }).catch((error) => {
+                const index = sent.indexOf(next)
+
+                if (index !== -1) {
+                    sent.splice(index, 1)
+                }
+
+                throw error
+            })
         }
 
         let notifying = false
@@ -139,7 +170,7 @@ export function createTagify({ window, modelBinding, assistant }) {
 
         if (binding !== null) {
             sync()
-            component.watch(binding.property, apply)
+            component.watch(binding.property, received)
         }
 
         records.set(element, {

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { modelBinding } from '../../resources/js/livewire.js'
+import { guardModelWrites, modelBinding } from '../../resources/js/livewire.js'
 import { component, settle, setup } from './helpers.js'
 
 // Values from the page window, as plain Node values.
@@ -31,6 +31,32 @@ test('writes tag objects once, live, and never echoes a server value', async () 
 
     await settle()
     assert.equal(bound.writes.length, 1)
+})
+
+test('keeps newer tags when the response to an earlier write reports its value', async () => {
+    const page = setup('<input id="labels">')
+    const bound = component({ labels: [] })
+    const field = page.mount('#labels', { property: 'labels', bound })
+    await settle()
+
+    field.tagify().addTags(['a'])
+    await settle()
+    field.tagify().addTags(['b'])
+    await settle()
+    assert.equal(bound.writes.length, 2)
+
+    bound.serverSets('labels', [{ value: 'a' }])
+    assert.deepEqual(tags(field), ['a', 'b'])
+
+    bound.serverSets('labels', [{ value: 'a' }, { value: 'b' }])
+    assert.deepEqual(tags(field), ['a', 'b'])
+
+    // Once Livewire has reported every write, its values show again.
+    bound.serverSets('labels', [{ value: 'a' }])
+    assert.deepEqual(tags(field), ['a'])
+
+    bound.serverSets('labels', ['z'])
+    assert.deepEqual(tags(field), ['z'])
 })
 
 test('writes the data-key of each tag with data-direct', async () => {
@@ -131,6 +157,29 @@ test('keeps Tagify\'s change event from Livewire and fires one for wire:change a
 
     await settle()
     assert.deepEqual(native, { a: ['Event'], b: 0, c: 1 })
+})
+
+test('puts Tagify\'s value back after Livewire writes to a wire:model field', async () => {
+    const page = setup('<input id="a" wire:model="labels"><input id="b">', { modelBinding })
+    const hooks = []
+
+    page.win.livewire = { hook: (name, callback) => hooks.push([name, callback]) }
+    guardModelWrites(page.win)
+    guardModelWrites(page.win)
+    assert.deepEqual(hooks.map(([name]) => name), ['interceptWireModelSetValue'])
+
+    const field = page.mount('#a', { bound: component({ labels: [{ value: 'php' }] }) })
+    const plainInput = page.document.getElementById('b')
+    const ownValue = field.element.value
+
+    for (const element of [field.element, plainInput]) {
+        hooks[0][1]({ el: element }, [{ value: 'php' }])
+        element.value = '[object Object]'
+    }
+
+    await Promise.resolve()
+    assert.equal(field.element.value, ownValue)
+    assert.equal(plainInput.value, '[object Object]')
 })
 
 test('hides data-suggest from Tagify, which reads it as text to suggest', async () => {

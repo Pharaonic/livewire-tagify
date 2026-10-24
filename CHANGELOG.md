@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here.
 
+## 1.3.1 - Unreleased
+
+### Fixed
+
+- A `wire:model` field keeps its tags after a response that changes another property. Livewire writes the property's value into the field as text, and Tagify reloaded its tags from it, turning tag objects into `[object Object]` and dropping what the user was typing.
+- Tags typed while an earlier change is still on its way to the server stay in the field. The response to that change no longer replaces them with its older value.
+
 ## 1.3.0 - 2026-10-24
 
 The first release for Livewire 1. Releases 1.0.0 to 1.2.1 were built for Livewire 2, so Composer never installs 1.3.0 in a Livewire 2 application.

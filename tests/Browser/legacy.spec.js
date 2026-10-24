@@ -29,6 +29,25 @@ test.describe('1.2 markup', () => {
         await expect(value(page, 'keywords')).toHaveText('[{"value":"one"},{"value":"two"},{"value":"three"}]')
     })
 
+    test('keeps tag objects when Livewire writes the model value into the field', async ({ page }) => {
+        await page.goto('/legacy')
+        await fields(page, 3)
+
+        await type(page, 'keywords', 'php')
+        await expect(value(page, 'keywords')).toHaveText('[{"value":"php"}]')
+
+        // A response that changes another property makes Livewire write every wire:model field.
+        await page.click('#set-groups')
+        await expect(value(page, 'groups')).toHaveText('["Team C"]')
+        await settle(page)
+        // Tagify checks its field every 600ms.
+        await page.waitForTimeout(1300)
+
+        expect(await tags(page, 'keywords')).toEqual(['php'])
+        await type(page, 'keywords', 'laravel')
+        await expect(value(page, 'keywords')).toHaveText('[{"value":"php"},{"value":"laravel"}]')
+    })
+
     test('enforces the suggestion list with data-suggest-enforce', async ({ page }) => {
         await page.goto('/legacy')
         await fields(page, 3)
