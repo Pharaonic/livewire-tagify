@@ -13,9 +13,17 @@ The property comes from `wire:model` on the field, or from `data-property`. When
 
 Both accept a property name or a dot path (`filters.tags`, `rows.2.labels`).
 
-### Modifiers on Livewire 1
+### Modifiers on Livewire 2
 
-Livewire 1 has no deferred updates, so every change is sent right away, whatever the modifiers: `wire:model`, `wire:model.lazy`, and `wire:model.debounce.500ms` all write on each change. `data-property` writes right away too.
+The modifiers mean what they mean in Livewire 2:
+
+| Attribute | The change is sent |
+| --- | --- |
+| `wire:model` | right away |
+| `wire:model.defer` | with the component's next request, such as a `wire:click` |
+| `wire:model.lazy`, `wire:model.debounce.500ms` | right away: Tagify reports a change once the tags have changed, so there is nothing to wait for |
+
+`data-property` always sends right away.
 
 ### Value Shapes
 
@@ -55,7 +63,7 @@ A plain value shows the suggestion it names: the entry of the suggestion list wh
 
 ### Reacting to Changes
 
-`wire:change` on the field runs after the new value is written, so the action sees it:
+`wire:change` on the field runs after the new value is written, so the action sees it. With `wire:model.defer`, the deferred value travels in the `wire:change` request:
 
 ```blade
 <div wire:ignore>

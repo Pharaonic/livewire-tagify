@@ -1,5 +1,5 @@
 import { installLegacy } from './legacy.js'
-import { modelBinding } from './livewire.js'
+import { guardModelWrites, modelBinding } from './livewire.js'
 import { createTagify } from './tagify.js'
 
 /**
@@ -25,7 +25,7 @@ function install(win) {
         }
     }
 
-    const integration = createTagify({ window: win, modelBinding, assistant: () => assistant })
+    const integration = createTagify({ window: win, modelBinding, guardModelWrites, assistant: () => assistant })
     const api = Object.freeze({})
 
     namespace.tagify = api

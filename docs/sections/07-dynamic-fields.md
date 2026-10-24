@@ -37,14 +37,14 @@ Inside `wire:ignore`, Livewire never changes the field, so a new `data-suggest-l
 A field outside `wire:ignore` works too. Livewire's update removes the markup Tagify added, and the package rebuilds the field after each update, with the property's current value. Every request that re-renders the component rebuilds the field and closes an open dropdown, so prefer `wire:ignore`.
 
 :::warning Key ignored blocks that come and go
-Livewire 1 compares siblings by position. When ignored blocks can appear or disappear next to each other, give each a unique `wire:key`.
+Without keys, Livewire compares siblings by position. When ignored blocks can appear or disappear next to each other, give each a unique `wire:key`.
 :::
 
 ### Nested Components and Many Fields
 
 Each field binds to the closest Livewire component around it. A field in a nested component writes to that component, never to the parent. Any number of fields can share a page.
 
-`data-component-id` binds a field to a specific component wherever it is. In a Livewire 1 view the id is `$this->id`. An empty value means the closest component.
+`data-component-id` binds a field to a specific component wherever it is. In a Livewire 2 view the id is `$this->id`. An empty value means the closest component.
 
 ### Fields You Add Yourself
 
@@ -55,6 +55,6 @@ Pharaonic.assistant.scan(container)     // mounts the fields in container
 Pharaonic.assistant.destroy(container)  // cleans them up
 ```
 
-### Turbolinks
+### Turbolinks and Turbo
 
-Fields are cleaned up before Turbolinks caches a page and mounted again when it comes back.
+Livewire 2 works with Turbolinks and Turbo through Livewire's [`livewire-turbolinks`](https://github.com/livewire/turbolinks) adapter. Fields are cleaned up before a page is cached and mounted again when it comes back.
