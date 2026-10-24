@@ -159,6 +159,32 @@ test('keeps Tagify\'s change event from Livewire and fires one for wire:change a
     assert.deepEqual(native, { a: ['Event'], b: 0, c: 1 })
 })
 
+test('reads wire:model with Livewire 2 semantics: live unless deferred', () => {
+    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model.lazy="a.b"><input id="c" wire:model.debounce.500ms="c"><input id="d" wire:model=" "><input id="e"><input id="f" wire:model.defer="f">', { withTagify: false })
+    const binding = (id) => modelBinding(page.document.getElementById(id))
+
+    assert.deepEqual(binding('a'), { property: 'labels', live: true })
+    assert.deepEqual(binding('b'), { property: 'a.b', live: true })
+    assert.deepEqual(binding('c'), { property: 'c', live: true })
+    assert.deepEqual(binding('f'), { property: 'f', live: false })
+    assert.equal(binding('d'), null)
+    assert.equal(binding('e'), null)
+})
+
+test('writes wire:model.defer as a deferred update, and still fires wire:change after it', async () => {
+    const page = setup('<input id="a" wire:model.defer="labels" wire:change="changed">', { modelBinding })
+    const field = page.mount('#a', { bound: component({ labels: [] }) })
+    let native = 0
+
+    await settle()
+    field.element.addEventListener('change', () => native++)
+    field.tagify().addTags(['x'])
+    await settle()
+
+    assert.deepEqual(plain(field.component.writes), [['labels', [{ value: 'x' }], { live: false }]])
+    assert.equal(native, 1)
+})
+
 test('puts Tagify\'s value back after Livewire writes to a wire:model field', async () => {
     const page = setup('<input id="a" wire:model="labels"><input id="b">', { modelBinding })
     const hooks = []
