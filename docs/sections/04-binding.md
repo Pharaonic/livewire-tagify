@@ -13,17 +13,17 @@ The property comes from `wire:model` on the field, or from `data-property`. When
 
 Both accept a property name or a dot path (`filters.tags`, `rows.2.labels`).
 
-### Modifiers on Livewire 2
+### Modifiers on Livewire 3
 
-The modifiers mean what they mean in Livewire 2:
+The modifiers mean what they mean in Livewire 3:
 
 | Attribute | The change is sent |
 | --- | --- |
-| `wire:model` | right away |
-| `wire:model.defer` | with the component's next request, such as a `wire:click` |
-| `wire:model.lazy`, `wire:model.debounce.500ms` | right away: Tagify reports a change once the tags have changed, so there is nothing to wait for |
+| `wire:model` | with the component's next request, such as a `wire:click` |
+| `wire:model.live` | right away |
+| `wire:model.lazy`, `wire:model.change`, `wire:model.blur` | right away: Tagify reports a change once the tags have changed, which is the change and the blur these modifiers wait for |
 
-`data-property` always sends right away.
+`.debounce` only changes when a live change is sent. `data-property` always sends right away.
 
 ### Value Shapes
 
@@ -63,7 +63,7 @@ A plain value shows the suggestion it names: the entry of the suggestion list wh
 
 ### Reacting to Changes
 
-`wire:change` on the field runs after the new value is written, so the action sees it. With `wire:model.defer`, the deferred value travels in the `wire:change` request:
+`wire:change` on the field runs after the new value is written, so the action sees it. With a plain `wire:model`, the deferred value travels in the `wire:change` request:
 
 ```blade
 <div wire:ignore>

@@ -4,9 +4,9 @@ Install the package with Composer, keep Tagify on the page, and load the scripts
 
 ### Requirements
 
-- PHP 8.0 to 8.3, as supported by your Laravel version
-- Laravel 7.30+, 8.75+, 9, or 10
-- Livewire 2.12.7 or later (see [Compatibility](#compatibility))
+- PHP 8.1 to 8.5, as supported by your Laravel version
+- Laravel 10.15+, 11, 12, or 13
+- Livewire 3.8.3 or later (see [Compatibility](#compatibility))
 - Tagify 4, loaded by your application
 - A modern browser (ES2019); Internet Explorer is not supported
 
@@ -18,15 +18,10 @@ composer require pharaonic/livewire-tagify
 
 Composer also installs `pharaonic/livewire-assistant`. Laravel discovers both service providers automatically. There is nothing to publish and no configuration file.
 
-:::warning Composer and unmaintained releases
-Livewire 2.12.7 and later have no known advisories, but every Laravel 7, 8, 9, and 10 release has security advisories that no release in its major fixes. Recent Composer versions refuse to install or update the framework until you allow them. If you accept the risk, allow these packages in your application's `composer.json`:
+:::warning Composer and unmaintained Laravel versions
+Livewire 3.8.3 and later, Laravel 12, and Laravel 13 have no known advisories. Every Laravel 10 and 11 release has security advisories that no release in its major fixes. Adding this package to an existing application works, because Composer leaves locked packages alone. When you later install or update Laravel 10 or 11, recent Composer versions refuse to resolve it.
 
-| Laravel | Packages to allow |
-| --- | --- |
-| 7 | `laravel/framework`, `league/commonmark`, `league/flysystem` |
-| 8 | `laravel/framework`, `league/flysystem` |
-| 9 on PHP 8.0 | `laravel/framework`, `symfony/http-foundation`, `symfony/mailer`, `symfony/mime`, `symfony/process`, `symfony/routing`, `symfony/yaml` |
-| 9 on PHP 8.1+, 10 | `laravel/framework` |
+If you accept the risk, allow `laravel/framework` in your application's `composer.json`. That is the only package to allow on a fresh Laravel 10 or 11 application with Livewire 3:
 
 ```bash title="Terminal" no-line-numbers
 composer config --json policy.advisories.ignore '{"laravel/framework": "No fixed release within this Laravel major."}'
@@ -56,8 +51,8 @@ Load Tagify and its stylesheet the way you already do, then add `@livewireTagify
 The directive renders two `<script>` tags: the Livewire Assistant runtime and this integration. Each is rendered once per page, even when layouts, partials, and `@livewireAssistantScripts` ask for it again.
 
 ```html no-copy
-<script src="https://example.com/pharaonic/livewire-assistant/assistant.js?id=3f9a1c2b7d4e5f60" data-turbo-eval="false" data-turbolinks-eval="false"></script>
-<script src="https://example.com/pharaonic/livewire-tagify/tagify.js?id=0d8eee40cb71f6d7" data-turbo-eval="false" data-turbolinks-eval="false"></script>
+<script src="https://example.com/pharaonic/livewire-assistant/assistant.js?id=3f9a1c2b7d4e5f60" data-navigate-once="true"></script>
+<script src="https://example.com/pharaonic/livewire-tagify/tagify.js?id=0d8eee40cb71f6d7" data-navigate-once="true"></script>
 ```
 
 Tagify is read from `window.Tagify` when a field mounts, not when the script loads, so its order relative to the directive does not matter. If it is still missing when the page has finished loading, the field is reported as `mount-failed` with the `tagify-missing` cause.
