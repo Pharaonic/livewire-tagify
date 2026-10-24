@@ -33,6 +33,32 @@ test('writes tag objects once, live, and never echoes a server value', async () 
     assert.equal(bound.writes.length, 1)
 })
 
+test('keeps newer tags when the response to an earlier write reports its value', async () => {
+    const page = setup('<input id="labels">')
+    const bound = component({ labels: [] })
+    const field = page.mount('#labels', { property: 'labels', bound })
+    await settle()
+
+    field.tagify().addTags(['a'])
+    await settle()
+    field.tagify().addTags(['b'])
+    await settle()
+    assert.equal(bound.writes.length, 2)
+
+    bound.serverSets('labels', [{ value: 'a' }])
+    assert.deepEqual(tags(field), ['a', 'b'])
+
+    bound.serverSets('labels', [{ value: 'a' }, { value: 'b' }])
+    assert.deepEqual(tags(field), ['a', 'b'])
+
+    // Once Livewire has reported every write, its values show again.
+    bound.serverSets('labels', [{ value: 'a' }])
+    assert.deepEqual(tags(field), ['a'])
+
+    bound.serverSets('labels', ['z'])
+    assert.deepEqual(tags(field), ['z'])
+})
+
 test('writes the data-key of each tag with data-direct', async () => {
     const page = setup(`<input id="labels" data-direct data-key="id" data-value="name" data-suggest-list='[{"id":1,"name":"One"},{"id":2,"name":"Two"}]'>`)
     const bound = component({ labels: [1] })

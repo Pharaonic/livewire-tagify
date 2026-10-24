@@ -267,12 +267,29 @@ function createTagify({ window: window2, modelBinding: modelBinding2, guardModel
         apply(component.get(binding.property));
       }
     };
+    const sent = [];
+    const received = (incoming) => {
+      const echoed = sent.findIndex((entry) => same(entry, incoming));
+      if (echoed === -1) {
+        sent.length = 0;
+        apply(incoming);
+      } else {
+        sent.splice(0, echoed + 1);
+      }
+    };
     const write = () => {
       const next = value.read(tagify);
       if (same(next, component.get(binding.property))) {
         return null;
       }
-      return component.set(binding.property, next, { live: binding.live });
+      sent.push(next);
+      return component.set(binding.property, next, { live: binding.live }).catch((error) => {
+        const index = sent.indexOf(next);
+        if (index !== -1) {
+          sent.splice(index, 1);
+        }
+        throw error;
+      });
     };
     let notifying = false;
     const shield = (event) => {
@@ -310,7 +327,7 @@ function createTagify({ window: window2, modelBinding: modelBinding2, guardModel
     tagify.on("change", changed);
     if (binding !== null) {
       sync();
-      component.watch(binding.property, apply);
+      component.watch(binding.property, received);
     }
     records.set(element, {
       refresh() {

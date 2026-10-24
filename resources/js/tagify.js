@@ -82,6 +82,22 @@ export function createTagify({ window, modelBinding, guardModelWrites = () => {}
             }
         }
 
+        // Values this field sent that Livewire has not reported back yet, oldest first.
+        const sent = []
+
+        // The response to an earlier write reports that value while the user has kept
+        // typing; the newer value is already on its way, so the older one is not shown.
+        const received = (incoming) => {
+            const echoed = sent.findIndex((entry) => same(entry, incoming))
+
+            if (echoed === -1) {
+                sent.length = 0
+                apply(incoming)
+            } else {
+                sent.splice(0, echoed + 1)
+            }
+        }
+
         // Returns the request that carries a changed value, or null when Livewire already holds it.
         const write = () => {
             const next = value.read(tagify)
@@ -90,7 +106,17 @@ export function createTagify({ window, modelBinding, guardModelWrites = () => {}
                 return null
             }
 
-            return component.set(binding.property, next, { live: binding.live })
+            sent.push(next)
+
+            return component.set(binding.property, next, { live: binding.live }).catch((error) => {
+                const index = sent.indexOf(next)
+
+                if (index !== -1) {
+                    sent.splice(index, 1)
+                }
+
+                throw error
+            })
         }
 
         let notifying = false
@@ -144,7 +170,7 @@ export function createTagify({ window, modelBinding, guardModelWrites = () => {}
 
         if (binding !== null) {
             sync()
-            component.watch(binding.property, apply)
+            component.watch(binding.property, received)
         }
 
         records.set(element, {
