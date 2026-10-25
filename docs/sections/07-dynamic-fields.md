@@ -44,7 +44,7 @@ Without keys, Livewire compares siblings by position. When ignored blocks can ap
 
 Each field binds to the closest Livewire component around it. A field in a nested component writes to that component, never to the parent. Any number of fields can share a page.
 
-`data-component-id` binds a field to a specific component wherever it is. In a Livewire 3 view the id is `$this->getId()`. An empty value means the closest component.
+`data-component-id` binds a field to a specific component wherever it is. In a Livewire 4 view the id is `$this->getId()`. An empty value means the closest component.
 
 ### Fields You Add Yourself
 

@@ -41,7 +41,7 @@ function modelBinding(element) {
   if (model === null) {
     return null;
   }
-  const live = ["live", "lazy", "change", "blur"].some((modifier) => model.modifiers.includes(modifier));
+  const live = ["live", "lazy"].some((modifier) => model.modifiers.includes(modifier));
   return { property: model.property, live };
 }
 var guarded = /* @__PURE__ */ new WeakSet();
@@ -131,8 +131,12 @@ var LISTS = {
   "data-suggest-list": "whitelist",
   "data-black-list": "blacklist"
 };
+var UNSAFE_KEYS = ["__proto__", "constructor", "prototype"];
 function merge(target, source) {
   for (const [key, value] of Object.entries(source)) {
+    if (UNSAFE_KEYS.includes(key)) {
+      continue;
+    }
     if (isPlainObject(value) && isPlainObject(target[key])) {
       merge(target[key], value);
     } else {

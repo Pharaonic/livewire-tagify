@@ -37,7 +37,8 @@ export async function settle(page) {
 export function messages(page) {
     const requests = []
 
-    page.on('request', (request) => request.url().includes('/livewire/update') && requests.push(request.postDataJSON()))
+    // Livewire 4 serves updates at /livewire-{hash of the app key}/update.
+    page.on('request', (request) => /\/livewire-[0-9a-f]{8}\/update$/.test(new URL(request.url()).pathname) && requests.push(request.postDataJSON()))
 
     return requests
 }

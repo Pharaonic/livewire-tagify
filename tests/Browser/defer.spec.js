@@ -31,7 +31,7 @@ test('wire:change on a deferred field carries the new value in its request', asy
     await expect(page.locator('#topics-value')).toHaveText('[["sport"],["sport","news"]]')
 })
 
-test('a field keeps what the user types while Livewire 3 writes the model value', async ({ page }) => {
+test('a field keeps what the user types while Livewire 4 writes the model value', async ({ page }) => {
     await type(page, 'topic', 'sport')
     await expect(page.locator('#topics-value')).toHaveText('[["sport"]]')
     await settle(page)
