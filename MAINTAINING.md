@@ -36,7 +36,7 @@ Versions are `N.minor.patch`, where `N` is the Livewire major. Releases 1.0.0 to
 
 ## Package-specific constraints
 
-- Only `resources/js/livewire.js` differs between lines: it maps `wire:model` modifiers to live or deferred writes with the line's Livewire semantics. Everything else talks to Livewire through the Assistant bridge, so fixes port between lines unchanged.
+- Only `resources/js/livewire.js` and `src/Script.php` differ between lines: `livewire.js` maps `wire:model` modifiers to live or deferred writes with the line's Livewire semantics and keeps that Livewire from writing to the field, and `Script.php` marks the script tags for the line's navigation (Turbolinks and Turbo on 1.x and 2.x, `wire:navigate` on 3.x). `resources/js/tagify.js` also passes the field to `guardModelWrites` on 3.x only; 1.x and 2.x take it with their next change there. Everything else talks to Livewire through the Assistant bridge, so fixes port between lines unchanged.
 - `dist/` is committed so Composer users need no Node build. Run `npm run build` after any change under `resources/js/` and commit the result; CI fails when `dist/` is out of date.
 - Tagify dispatches a native `change` on the original field with its value as text, and checks that field every 600ms, reloading its tags when something else changed it. Livewire must therefore never see Tagify's event or write the field; values are loaded through `loadOriginalValues()`, which fires no change event. Tagify also ignores changes for 100ms after a load.
 - Tagify reads `data-suggest` as text to suggest while typing, so the shorthand is hidden while Tagify builds the field. Tagify needs a `value` on every tag and whitelist object; tags built from plain server values get their text as `value`.
