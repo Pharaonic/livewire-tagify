@@ -13,7 +13,7 @@ The 3.x line for Livewire 3. The attributes, the directive, the value shapes, an
 
 ### Changed
 
-- `wire:model` follows Livewire 3: a plain `wire:model` sends the tags with the component's next request, and `.live`, `.lazy`, `.change`, and `.blur` send them right away.
+- `wire:model` follows Livewire 3: a plain `wire:model` sends the tags with the component's next request, and `.live`, `.lazy`, `.change`, and `.blur` send them right away. `.debounce` without `.live` is deferred too.
 - The script tags carry `data-navigate-once="true"` instead of the Turbolinks and Turbo attributes.
 
 ### Fixed
