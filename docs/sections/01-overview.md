@@ -28,6 +28,6 @@ Each field binds to the component around it, so nested components and many field
 The script ships prebuilt in the Composer package, or as an ES module for bundlers such as Vite.
 :::
 
-:::info Livewire 3 line
-This documentation covers the 3.x line, which supports Livewire 3. Each Livewire major gets its own line. Coming from 2.x? See [Upgrading from 2.x](#upgrading).
+:::info Livewire 4 line
+This documentation covers the 4.x line, which supports Livewire 4. Each Livewire major gets its own line. Coming from 3.x? See [Upgrading from 3.x](#upgrading).
 :::

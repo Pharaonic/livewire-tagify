@@ -5,8 +5,8 @@ Install the package with Composer, keep Tagify on the page, and load the scripts
 ### Requirements
 
 - PHP 8.1 to 8.5, as supported by your Laravel version
-- Laravel 10.15+, 11, 12, or 13
-- Livewire 3.8.3 or later (see [Compatibility](#compatibility))
+- Laravel 10.16+, 11, 12, or 13
+- Livewire 4.3.4 or later (see [Compatibility](#compatibility))
 - Tagify 4, loaded by your application
 - A modern browser (ES2019); Internet Explorer is not supported
 
@@ -19,9 +19,9 @@ composer require pharaonic/livewire-tagify
 Composer also installs `pharaonic/livewire-assistant`. Laravel discovers both service providers automatically. There is nothing to publish and no configuration file.
 
 :::warning Composer and unmaintained Laravel versions
-Livewire 3.8.3 and later, Laravel 12, and Laravel 13 have no known advisories. Every Laravel 10 and 11 release has security advisories that no release in its major fixes. Adding this package to an existing application works, because Composer leaves locked packages alone. When you later install or update Laravel 10 or 11, recent Composer versions refuse to resolve it.
+Livewire 4.3.4 and later, Laravel 12, and Laravel 13 have no known advisories. Every Laravel 10 and 11 release has security advisories that no release in its major fixes. Adding this package to an existing application works, because Composer leaves locked packages alone. When you later install or update Laravel 10 or 11, recent Composer versions refuse to resolve it.
 
-If you accept the risk, allow `laravel/framework` in your application's `composer.json`. That is the only package to allow on a fresh Laravel 10 or 11 application with Livewire 3:
+If you accept the risk, allow `laravel/framework` in your application's `composer.json`. That is the only package to allow on a fresh Laravel 10 or 11 application with Livewire 4:
 
 ```bash title="Terminal" no-line-numbers
 composer config --json policy.advisories.ignore '{"laravel/framework": "No fixed release within this Laravel major."}'

@@ -13,17 +13,18 @@ The property comes from `wire:model` on the field, or from `data-property`. When
 
 Both accept a property name or a dot path (`filters.tags`, `rows.2.labels`).
 
-### Modifiers on Livewire 3
+### Modifiers on Livewire 4
 
-The modifiers mean what they mean in Livewire 3:
+The modifiers mean what they mean in Livewire 4:
 
 | Attribute | The change is sent |
 | --- | --- |
 | `wire:model` | with the component's next request, such as a `wire:click` |
 | `wire:model.live` | right away |
-| `wire:model.lazy`, `wire:model.change`, `wire:model.blur` | right away: Tagify reports a change once the tags have changed, which is the change and the blur these modifiers wait for |
+| `wire:model.lazy` | right away: Tagify reports a change once the tags have changed, which is the change this modifier waits for |
+| `wire:model.blur`, `wire:model.change` | with the component's next request: without `.live`, Livewire 4 only uses them to time the update in the browser |
 
-`.debounce` only changes when a live change is sent. `data-property` always sends right away.
+Triggers after `.live`, such as `.live.blur` or `.live.debounce.500ms`, send right away too, since a Tagify change is the change and the blur they wait for. `data-property` always sends right away.
 
 ### Value Shapes
 
