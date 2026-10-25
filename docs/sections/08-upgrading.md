@@ -30,6 +30,10 @@ Livewire 3 defers a plain `wire:model`, and so does this package: the tags reach
 | `wire:model.lazy` | Unchanged: sent right away |
 | `wire:model.debounce.500ms` | `wire:model.live.debounce.500ms` |
 
+:::info .debounce alone is deferred
+On 2.x, `wire:model.debounce.500ms` sent the tags right away. On 3.x, without `.live`, it waits for the component's next request like a plain `wire:model`. Add `.live` to keep it live.
+:::
+
 `wire:model.change` and `wire:model.blur` are sent right away too. `data-property` still sends right away.
 
 ### Attributes
