@@ -4,11 +4,11 @@
     <output id="topics-value">{{ json_encode($topics) }}</output>
 
     <div wire:ignore>
-        <input id="draft" data-pharaonic="tagify" wire:model.defer="draft" data-direct>
+        <input id="draft" data-pharaonic="tagify" wire:model="draft" data-direct>
     </div>
 
     <div wire:ignore>
-        <input id="topic" data-pharaonic="tagify" wire:model.defer="topic" wire:change="topicChanged" data-direct>
+        <input id="topic" data-pharaonic="tagify" wire:model="topic" wire:change="topicChanged" data-direct>
     </div>
 
     <button id="save" wire:click="save">save</button>

@@ -14,7 +14,7 @@ export function tagifyError(code, message) {
  *
  * - `window` is the page window; Tagify is read from it at mount.
  * - `modelBinding(element)` reads `wire:model` with the line's Livewire semantics.
- * - `guardModelWrites(window)` keeps the line's Livewire from writing to `wire:model` fields.
+ * - `guardModelWrites(window, element)` keeps the line's Livewire from writing to a `wire:model` field.
  * - `assistant()` returns the runtime once it has registered this integration.
  */
 export function createTagify({ window, modelBinding, guardModelWrites = () => {}, assistant }) {
@@ -67,7 +67,7 @@ export function createTagify({ window, modelBinding, guardModelWrites = () => {}
         let tagify = create(element, settings)
 
         if (hasWire(element, 'wire:model')) {
-            guardModelWrites(window)
+            guardModelWrites(window, element)
         }
 
         const apply = (incoming) => {

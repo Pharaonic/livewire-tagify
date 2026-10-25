@@ -1,67 +1,49 @@
-## Upgrading from 1.2
+## Upgrading from 2.x
 
-Releases 1.0 to 1.2.1 supported Livewire 2. Their successor is this 2.x line. Your markup keeps working, attributes included.
+The 2.x line supports Livewire 2. When your application moves to Livewire 3, move this package to the 3.x line. The attributes, the directive, the value shapes, and the JavaScript API are unchanged; what changes is what Livewire 3 changes.
 
-### Install 2.x
+Coming from 1.2? Follow the upgrade guide of the 2.x docs first.
 
-A `^1.2` constraint never moves to 2.x, so require the new line:
+### Install 3.x
+
+A `^2.0` constraint never moves to 3.x, so require the new line:
 
 ```bash title="Terminal" no-line-numbers
-composer require pharaonic/livewire-tagify:^2.0
+composer require pharaonic/livewire-tagify:^3.0
 ```
 
-The requirements are higher than 1.2's:
-
-| | 1.2 | 2.x |
+| | 2.x | 3.x |
 | --- | --- | --- |
-| PHP | 7.2+ | 8.0 to 8.3 |
-| Livewire | 2.0+ | 2.12.7+ |
-| Laravel | through Livewire | 7.30+, 8.75+, 9, 10 |
+| PHP | 8.0 to 8.3 | 8.1 to 8.5 |
+| Livewire | 2.12.7+ | 3.8.3+ |
+| Laravel | 7.30+, 8.75+, 9, 10 | 10.15+, 11, 12, 13 |
+| Livewire Assistant | 2.x | 3.x |
 
-Composer also installs `pharaonic/livewire-assistant`.
+### wire:model
 
-### Scripts
+Livewire 3 defers a plain `wire:model`, and so does this package: the tags reach the component with its next request.
 
-Use the directive in new code:
+| 2.x | 3.x |
+| --- | --- |
+| `wire:model` | `wire:model.live` |
+| `wire:model.defer` | `wire:model` |
+| `wire:model.lazy` | Unchanged: sent right away |
+| `wire:model.debounce.500ms` | `wire:model.live.debounce.500ms` |
 
-```blade title="resources/views/layouts/app.blade.php"
-{{-- 1.2 --}}
-<x-pharaonic-tagify::scripts />
-
-{{-- 2.x --}}
-@livewireTagifyScripts
-```
-
-`<x-pharaonic-tagify::scripts />` renders exactly the same tags, so you can switch whenever you like.
-
-If you published `vendor/pharaonic/pharaonic.tagify.min.js` and load it with your own `<script>` tag, switch to the directive now: the file needs the Livewire Assistant runtime, which the directive loads. Then delete the published file.
-
-:::info Deprecated, not removed
-The scripts component, the publish tag, and the old JavaScript functions still work on every 2.x release. New code should use their replacements. They will be removed no earlier than a future major line.
+:::info .debounce alone is deferred
+On 2.x, `wire:model.debounce.500ms` sent the tags right away. On 3.x, without `.live`, it waits for the component's next request like a plain `wire:model`. Add `.live` to keep it live.
 :::
+
+`wire:model.change` and `wire:model.blur` are sent right away too. `data-property` still sends right away.
 
 ### Attributes
 
-| 1.2 | 2.x |
-| --- | --- |
-| `data-component-id="{{ $this->id }}"` | Optional: the closest component is used |
-| `wire:model`, `wire:model.defer` | Unchanged; `.lazy` and `.debounce` are bound too |
-| `data-direct`, `data-key`, `data-value` | Unchanged |
-| `data-suggest-list`, `data-black-list` | Unchanged; a delimited list works too |
-| `data-suggest`, `data-suggest-enforce`, `data-max`, `data-classname` | Unchanged; `"false"` now turns a switch off |
+`data-component-id` takes the id from `$this->getId()`; `$this->id` no longer exists in Livewire 3. You can also leave the attribute out: the closest component is used.
 
-New: `data-property` to bind without `wire:model`, `data-delimiters`, and `data-options` for any other Tagify setting. See [Options](#options).
+### Navigation
 
-### Behaviour Changes
+Turbolinks and Turbo are replaced by `wire:navigate`. Fields are cleaned up before Livewire leaves a page and mounted again on the next one. The scripts carry `data-navigate-once="true"` instead of `data-turbo-eval` and `data-turbolinks-eval`.
 
-- Server-side changes to the property now show in the field.
-- The field shows the property's value when it mounts. On a bound field, its own `value` attribute is ignored; 1.2 read its tags from it.
-- Fields without `data-component-id` now mount; 1.2 skipped them.
-- Fields that Livewire adds later mount by themselves; you no longer need to dispatch `pharaonic.tagify.init`.
-- Tagify's `select` and `mix` modes bind one value and the mixed text. See [Select and Mix Modes](#modes).
-- Tagify's own `change` event no longer reaches Livewire or your listeners on a bound field, so a field sends one request per change. `wire:change` on the field now runs, after the value is written.
-- Tagify is read from `window.Tagify` when a field mounts, not when the script loads.
+### Deprecated, still working
 
-### JavaScript
-
-`Pharaonic.Tagify.init()`, `Pharaonic.Tagify.load(target, componentId)`, and the `pharaonic.tagify.init` and `pharaonic.tagify.load` events still work: they call `Pharaonic.assistant.scan()`. In new code, call that directly for fields you add yourself.
+`<x-pharaonic-tagify::scripts />`, the `livewire-tagify` publish tag, `Pharaonic.Tagify.init()`, `Pharaonic.Tagify.load(target, componentId)`, and the `pharaonic.tagify.init` and `pharaonic.tagify.load` events keep working on every 3.x release. New code should use `@livewireTagifyScripts` and `Pharaonic.assistant.scan(element)`.

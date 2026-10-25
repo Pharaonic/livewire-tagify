@@ -38,20 +38,30 @@ function readModel(element) {
 // resources/js/livewire.js
 function modelBinding(element) {
   const model = readModel(element);
-  return model === null ? null : { property: model.property, live: !model.modifiers.includes("defer") };
+  if (model === null) {
+    return null;
+  }
+  const live = ["live", "lazy", "change", "blur"].some((modifier) => model.modifiers.includes(modifier));
+  return { property: model.property, live };
 }
 var guarded = /* @__PURE__ */ new WeakSet();
-function guardModelWrites(window2) {
-  const livewire = window2.Livewire;
-  if (guarded.has(window2) || !livewire || typeof livewire.hook !== "function") {
+function guardModelWrites(window2, element) {
+  if (!element || guarded.has(element)) {
     return;
   }
-  guarded.add(window2);
-  livewire.hook("interceptWireModelSetValue", (_value, element) => {
-    if (element && element.__tagify && typeof element.tagifyValue === "string") {
-      window2.queueMicrotask(() => {
-        element.value = element.tagifyValue;
-      });
+  guarded.add(element);
+  const wrap = (writer2) => typeof writer2 !== "function" ? writer2 : (value) => {
+    writer2(value);
+    if (element.__tagify && typeof element.tagifyValue === "string") {
+      element.value = element.tagifyValue;
+    }
+  };
+  let writer = wrap(element._x_forceModelUpdate);
+  Object.defineProperty(element, "_x_forceModelUpdate", {
+    configurable: true,
+    get: () => writer,
+    set: (next) => {
+      writer = wrap(next);
     }
   });
 }
@@ -254,7 +264,7 @@ function createTagify({ window: window2, modelBinding: modelBinding2, guardModel
     const shielded = property !== null || hasWire(element, "wire:model") || hasWire(element, "wire:change");
     let tagify = create(element, settings);
     if (hasWire(element, "wire:model")) {
-      guardModelWrites2(window2);
+      guardModelWrites2(window2, element);
     }
     const apply = (incoming) => {
       if (!same(value.read(tagify), incoming)) {

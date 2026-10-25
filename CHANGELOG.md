@@ -2,6 +2,34 @@
 
 All notable changes to this project are documented here.
 
+## 3.0.0 - 2026-10-25
+
+The 3.x line for Livewire 3. The attributes, the directive, the value shapes, and the JavaScript API are the same as in 2.x. The documentation's upgrade guide lists what Livewire 3 changes in your markup.
+
+### Added
+
+- Livewire 3 support, on `pharaonic/livewire-assistant` 3.x.
+- `wire:navigate` support: fields are cleaned up before Livewire leaves a page and mounted again on the next one.
+
+### Changed
+
+- `wire:model` follows Livewire 3: a plain `wire:model` sends the tags with the component's next request, and `.live`, `.lazy`, `.change`, and `.blur` send them right away. `.debounce` without `.live` is deferred too.
+- The script tags carry `data-navigate-once="true"` instead of the Turbolinks and Turbo attributes.
+
+### Fixed
+
+- A `wire:model` field keeps its tags, and what the user is typing, when Alpine writes the property's value into it as text.
+
+### Compatibility
+
+- Livewire 3.8.3 or later, the first Livewire 3 release with no known advisory.
+- Laravel 10.15+ on PHP 8.1 to 8.3, Laravel 11 on PHP 8.2 to 8.4, Laravel 12 on PHP 8.2 to 8.5, and Laravel 13 on PHP 8.3 to 8.5.
+- Laravel 10 starts at 10.15: Livewire 3.8.3 calls `Stringable::isUrl()`, which earlier Laravel 10 releases lack.
+- Livewire 1 and 2 stay on the 1.x and 2.x lines.
+- Turbolinks and Turbo are not supported; Livewire 3 navigates with `wire:navigate`.
+- Tagify 4 remains your application's dependency; the suite runs on 4.39.0.
+- Laravel 10 and 11 no longer receive security fixes.
+
 ## 2.0.0 - 2026-10-24
 
 The 2.x line for Livewire 2, and the successor of 1.2.1. A `^1.2` constraint never moves here: run `composer require pharaonic/livewire-tagify:^2.0`. The documentation's upgrade guide lists every change.

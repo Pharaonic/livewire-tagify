@@ -34,7 +34,8 @@ final class FixtureApplication
         $app['config']->set('app.key', 'base64:'.base64_encode(str_repeat('a', 32)));
         $app['config']->set('app.debug', true);
         $app['config']->set('session.driver', 'cookie');
-        $app['config']->set('livewire.middleware_group', 'web');
+        // The fixture layout places @livewireScripts itself.
+        $app['config']->set('livewire.inject_assets', false);
         $app['view']->addNamespace('fixtures', __DIR__.'/../views');
 
         Livewire::component('tagify-demo', TagifyDemo::class);

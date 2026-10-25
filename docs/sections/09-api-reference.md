@@ -5,7 +5,7 @@
 | Attribute | Value |
 | --- | --- |
 | `data-pharaonic` | `tagify` |
-| `wire:model` | Property name or dot path; `.defer` waits for the next request; every other form is sent right away |
+| `wire:model` | Property name or dot path; waits for the next request, unless `.live`, `.lazy`, `.change`, or `.blur` sends it right away |
 | `data-property` | Property name or dot path; wins over `wire:model` |
 | `data-direct` | Bind each tag's `data-key` instead of tag objects; `"false"` turns it off |
 | `data-key` | The tag field `data-direct` binds; `value` when absent |
@@ -19,7 +19,7 @@
 | `data-value` | `tagTextProp`, `dropdown.mapValueTo`, and `dropdown.searchKeys` |
 | `data-options` | JSON object passed to Tagify, merged over the shorthands key by key |
 | `wire:change` | Runs after the new value is written |
-| `data-component-id` | Component id (`$this->id`); empty or absent means the closest component |
+| `data-component-id` | Component id (`$this->getId()`); empty or absent means the closest component |
 
 ### Bound Values
 

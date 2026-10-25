@@ -47,7 +47,7 @@ export const settle = () => new Promise((resolve) => setTimeout(resolve, 150))
  * A page with real Tagify (unless `withTagify` is false) and the integration
  * created against a recording assistant.
  */
-export function setup(html, { withTagify = true, modelBinding = () => null, readyState = 'complete' } = {}) {
+export function setup(html, { withTagify = true, modelBinding = () => null, guardModelWrites = () => {}, readyState = 'complete' } = {}) {
     const win = new Window({ url: 'https://example.test/' })
     const assistantCalls = []
 
@@ -66,7 +66,7 @@ export function setup(html, { withTagify = true, modelBinding = () => null, read
         destroy: (element) => assistantCalls.push(['destroy', element]),
         scan: (element) => assistantCalls.push(['scan', element]),
     }
-    const integration = createTagify({ window: win, modelBinding, assistant: () => assistant })
+    const integration = createTagify({ window: win, modelBinding, guardModelWrites, assistant: () => assistant })
 
     const mount = (selector, { property = null, options = {}, bound = component() } = {}) => {
         const element = win.document.querySelector(selector)
