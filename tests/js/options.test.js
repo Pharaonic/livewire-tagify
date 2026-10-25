@@ -75,6 +75,16 @@ test('does not share data-options objects with the settings', () => {
     assert.equal(options.dropdown.maxItems, 5)
 })
 
+test('does not let data-options reach Object.prototype', () => {
+    const options = JSON.parse('{"__proto__": {"polluted": 1}, "dropdown": {"__proto__": {"polluted": 2}, "constructor": {"prototype": {"polluted": 3}}}, "maxTags": 2}')
+    const { settings } = build('<input>', options)
+
+    assert.equal({}.polluted, undefined)
+    assert.equal(Object.prototype.hasOwnProperty.call(settings, '__proto__'), false)
+    assert.equal(Object.prototype.hasOwnProperty.call(settings.dropdown, 'constructor'), false)
+    assert.equal(settings.maxTags, 2)
+})
+
 test('hides data-suggest while the callback runs and restores it', () => {
     const input = element('<input data-suggest="x">')
     const seen = withoutShorthandOverrides(input, () => input.hasAttribute('data-suggest'))

@@ -131,8 +131,12 @@ var LISTS = {
   "data-suggest-list": "whitelist",
   "data-black-list": "blacklist"
 };
+var UNSAFE_KEYS = ["__proto__", "constructor", "prototype"];
 function merge(target, source) {
   for (const [key, value] of Object.entries(source)) {
+    if (UNSAFE_KEYS.includes(key)) {
+      continue;
+    }
     if (isPlainObject(value) && isPlainObject(target[key])) {
       merge(target[key], value);
     } else {
