@@ -159,17 +159,19 @@ test('keeps Tagify\'s change event from Livewire and fires one for wire:change a
     assert.deepEqual(native, { a: ['Event'], b: 0, c: 1 })
 })
 
-test('reads wire:model with Livewire 3 semantics: deferred unless live, lazy, change, or blur', () => {
-    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model.live="a.b"><input id="c" wire:model.live.debounce.500ms="c"><input id="d" wire:model=" "><input id="e"><input id="f" wire:model.lazy="f"><input id="g" wire:model.change="g"><input id="h" wire:model.blur="h"><input id="i" wire:model.defer="i">', { withTagify: false })
+test('reads wire:model with Livewire 4 semantics: deferred unless live or lazy', () => {
+    const page = setup('<input id="a" wire:model="labels"><input id="b" wire:model.live="a.b"><input id="c" wire:model.live.debounce.500ms="c"><input id="d" wire:model=" "><input id="e"><input id="f" wire:model.lazy="f"><input id="g" wire:model.change="g"><input id="h" wire:model.blur="h"><input id="i" wire:model.defer="i"><input id="j" wire:model.live.blur="j"><input id="k" wire:model.debounce.500ms="k">', { withTagify: false })
     const binding = (id) => modelBinding(page.document.getElementById(id))
 
     assert.deepEqual(binding('a'), { property: 'labels', live: false })
     assert.deepEqual(binding('b'), { property: 'a.b', live: true })
     assert.deepEqual(binding('c'), { property: 'c', live: true })
     assert.deepEqual(binding('f'), { property: 'f', live: true })
-    assert.deepEqual(binding('g'), { property: 'g', live: true })
-    assert.deepEqual(binding('h'), { property: 'h', live: true })
+    assert.deepEqual(binding('g'), { property: 'g', live: false })
+    assert.deepEqual(binding('h'), { property: 'h', live: false })
     assert.deepEqual(binding('i'), { property: 'i', live: false })
+    assert.deepEqual(binding('j'), { property: 'j', live: true })
+    assert.deepEqual(binding('k'), { property: 'k', live: false })
     assert.equal(binding('d'), null)
     assert.equal(binding('e'), null)
 })
