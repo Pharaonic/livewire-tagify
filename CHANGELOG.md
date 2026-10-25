@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here.
 
-## 3.0.0 - Unreleased
+## 3.0.0 - 2026-10-25
 
 The 3.x line for Livewire 3. The attributes, the directive, the value shapes, and the JavaScript API are the same as in 2.x. The documentation's upgrade guide lists what Livewire 3 changes in your markup.
 
